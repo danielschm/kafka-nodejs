@@ -1,0 +1,25 @@
+{
+  "name": "kafka-nodejs",
+  "version": "1.0.0",
+  "description": "Master Thesis Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "start:producer": "node ./producer/index.js",
+    "start:consumer": "node ./consumer/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danielschm/kafka-nodejs.git"
+  },
+  "author": "Daniel Schmitz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/danielschm/kafka-nodejs/issues"
+  },
+  "homepage": "https://github.com/danielschm/kafka-nodejs#readme",
+  "dependencies": {
+    "avsc": "^5.7.2",
+    "node-rdkafka": "^2.10.1"
+  }
+}
