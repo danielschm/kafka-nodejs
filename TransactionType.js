@@ -5,7 +5,8 @@ module.exports = avro.Type.forSchema({
     fields: [
         {name: "product_number", type: "string"},
         {name: "product_title", type: "string"},
-        {name: "quantity", type: "float"},
-        {name: "price", type: "float"}
+        {name: "quantity", type: "string"},
+        {name: "price", type: "string"},
+        {name: "timestamp", type: "string"}
     ]
 });

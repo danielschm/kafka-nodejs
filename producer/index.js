@@ -1,16 +1,28 @@
+const MESSAGE_INTERVAL = getRandomNumber(800);
+
 console.log("Producer...");
 const Kafka = require('node-rdkafka');
 const TransactionType = require("../TransactionType");
-const aMockData = require("../mockdata");
+const getMockData = require("./mockdata");
 
 const oStream = Kafka.Producer.createWriteStream({
     'metadata.broker.list': 'localhost:9092'
 }, {}, {topic: 'Transaction'});
 
-function queueMessage() {
-    const oTransaction = aMockData[Math.round(Math.random() * aMockData.length)];
+function getRandomNumber(iMax) {
+    return Math.round(Math.random() * (iMax-1));
+}
 
-    const bSuccess = oStream.write(TransactionType.toBuffer(oTransaction));
+function queueMessage(aMockData) {
+    const oTransaction = aMockData[getRandomNumber(aMockData.length)];
+
+    let bSuccess;
+    try {
+        bSuccess = oStream.write(TransactionType.toBuffer(oTransaction));
+    } catch (e) {
+        console.error(oTransaction);
+    }
+
     if (bSuccess) {
         console.log(`Message sent successfully`);
     } else {
@@ -18,6 +30,8 @@ function queueMessage() {
     }
 }
 
-setInterval(() => {
-    queueMessage();
-}, 3000);
+getMockData().then(aMockData => {
+    setInterval(() => {
+        queueMessage(aMockData);
+    }, MESSAGE_INTERVAL);
+});
