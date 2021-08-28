@@ -4,7 +4,7 @@ const TransactionType = require("../TransactionType");
 
 const oConsumer = Kafka.KafkaConsumer({
     'group.id': 'kafka',
-    'metadata.broker.list': 'localhost:9092'
+    'metadata.broker.list': '192.168.178.70:9092'
 }, {});
 
 oConsumer.connect();

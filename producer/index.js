@@ -1,4 +1,4 @@
-const MESSAGE_INTERVAL = getRandomNumber(800);
+const MESSAGE_INTERVAL = getRandomNumber(3000);
 
 console.log("Producer...");
 const Kafka = require('node-rdkafka');
@@ -6,7 +6,7 @@ const TransactionType = require("../TransactionType");
 const getMockData = require("./mockdata");
 
 const oStream = Kafka.Producer.createWriteStream({
-    'metadata.broker.list': 'localhost:9092'
+    'metadata.broker.list': '192.168.178.70:9092'
 }, {}, {topic: 'Transaction'});
 
 function getRandomNumber(iMax) {
