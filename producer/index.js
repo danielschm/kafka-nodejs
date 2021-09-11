@@ -18,7 +18,8 @@ function queueMessage(aMockData) {
 
     let bSuccess;
     try {
-        bSuccess = oStream.write(TransactionType.toBuffer(oTransaction));
+        // bSuccess = oStream.write(TransactionType.toBuffer(oTransaction));
+        bSuccess = oStream.write(JSON.stringify(processTransaction(oTransaction)));
     } catch (e) {
         console.error(oTransaction);
     }
@@ -28,6 +29,24 @@ function queueMessage(aMockData) {
     } else {
         console.log(`An error occured while sending the message`);
     }
+}
+
+let nTotalResult = 0;
+const BONUS_PERCENT = 0.2;
+
+// To be done in SAP System
+function processTransaction(t) {
+    t.result = t.price * t.quantity * BONUS_PERCENT;
+    nTotalResult += t.result;
+    t.newTotalResult = nTotalResult;
+
+    t.result = Math.round(t.result).toString();
+    t.newTotalResult = Math.round(t.newTotalResult).toString();
+
+    const oDate = new Date();
+    const fn = i => i.toString().padStart(2, "0");
+    t.timestamp = `${fn(oDate.getHours())}:${fn(oDate.getMinutes())}:${fn(oDate.getSeconds())}`;
+    return t;
 }
 
 getMockData().then(aMockData => {
