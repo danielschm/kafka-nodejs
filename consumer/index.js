@@ -12,7 +12,7 @@ oConsumer.connect();
 oConsumer
     .on('ready', () => {
         console.log('Consumer ready');
-        oConsumer.subscribe(['trans23']);
+        oConsumer.subscribe(['Result']);
         oConsumer.consume();
     })
     .on('data', (data) => {

@@ -1,4 +1,4 @@
-// const MESSAGE_INTERVAL = getRandomNumber(3500);
+const MESSAGE_INTERVAL = 2000;
 
 console.log("Producer...");
 
@@ -15,12 +15,11 @@ const producer = kafka.producer();
 
 // we define an async function that writes a new message each second
 const produce = async () => {
-    await producer.connect()
+    await producer.connect();
 
-    const sMessage = await getRandomMessageJSON();
-
-    // setInterval(async () => {
+    setInterval(async () => {
         try {
+            const sMessage = await getRandomMessageJSON();
             await producer.send({
                 topic,
                 messages: [
@@ -34,7 +33,7 @@ const produce = async () => {
         } catch (err) {
             console.error("Could not write message " + err);
         }
-    // }, MESSAGE_INTERVAL);
+    }, MESSAGE_INTERVAL);
 }
 
 produce();
