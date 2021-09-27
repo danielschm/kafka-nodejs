@@ -12,9 +12,9 @@ oConsumer.connect();
 oConsumer
     .on('ready', () => {
         console.log('Consumer ready');
-        oConsumer.subscribe(['Transaction']);
+        oConsumer.subscribe(['trans23']);
         oConsumer.consume();
     })
     .on('data', (data) => {
-        console.log(`Received message: '${TransactionType.fromBuffer(data.value)}'`);
+        console.log(`Received message: '${data.value}'`);
     });

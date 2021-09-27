@@ -1,56 +1,40 @@
-const MESSAGE_INTERVAL = getRandomNumber(3000);
+// const MESSAGE_INTERVAL = getRandomNumber(3500);
 
 console.log("Producer...");
-const Kafka = require('node-rdkafka');
-const TransactionType = require("../TransactionType");
-const getMockData = require("./mockdata");
 
-const oStream = Kafka.Producer.createWriteStream({
-    'metadata.broker.list': '192.168.178.70:9092'
-}, {}, {topic: 'Transaction'});
+const { getRandomMessageJSON } = require("./mockdata");
 
-function getRandomNumber(iMax) {
-    return Math.round(Math.random() * (iMax-1));
+const { Kafka } = require("kafkajs")
+
+const clientId = "nodejs-producer";
+const brokers = ["192.168.178.70:9092"];
+const topic = "Transaction";
+
+const kafka = new Kafka({ clientId, brokers })
+const producer = kafka.producer();
+
+// we define an async function that writes a new message each second
+const produce = async () => {
+    await producer.connect()
+
+    const sMessage = await getRandomMessageJSON();
+
+    // setInterval(async () => {
+        try {
+            await producer.send({
+                topic,
+                messages: [
+                    {
+                        value: sMessage
+                    }
+                ]
+            });
+
+            console.log("Writes: ", sMessage);
+        } catch (err) {
+            console.error("Could not write message " + err);
+        }
+    // }, MESSAGE_INTERVAL);
 }
 
-function queueMessage(aMockData) {
-    const oTransaction = aMockData[getRandomNumber(aMockData.length)];
-
-    let bSuccess;
-    try {
-        // bSuccess = oStream.write(TransactionType.toBuffer(oTransaction));
-        bSuccess = oStream.write(JSON.stringify(processTransaction(oTransaction)));
-    } catch (e) {
-        console.error(oTransaction);
-    }
-
-    if (bSuccess) {
-        console.log(`Message sent successfully`);
-    } else {
-        console.log(`An error occured while sending the message`);
-    }
-}
-
-let nTotalResult = 0;
-const BONUS_PERCENT = 0.2;
-
-// To be done in SAP System
-function processTransaction(t) {
-    t.result = t.price * t.quantity * BONUS_PERCENT;
-    nTotalResult += t.result;
-    t.newTotalResult = nTotalResult;
-
-    t.result = Math.round(t.result).toString();
-    t.newTotalResult = Math.round(t.newTotalResult).toString();
-
-    const oDate = new Date();
-    const fn = i => i.toString().padStart(2, "0");
-    t.timestamp = `${fn(oDate.getHours())}:${fn(oDate.getMinutes())}:${fn(oDate.getSeconds())}`;
-    return t;
-}
-
-getMockData().then(aMockData => {
-    setInterval(() => {
-        queueMessage(aMockData);
-    }, MESSAGE_INTERVAL);
-});
+produce();

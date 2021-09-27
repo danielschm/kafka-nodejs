@@ -21,6 +21,7 @@
   "dependencies": {
     "avsc": "^5.7.2",
     "fetch": "^1.1.0",
+    "kafkajs": "^1.15.0",
     "node-rdkafka": "^2.10.1",
     "xml2json": "^0.12.0"
   }

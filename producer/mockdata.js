@@ -1,25 +1,29 @@
 const fetch = require("fetch");
 const parser = require('xml2json');
+const TransactionType = require("../TransactionType");
 
 function parseProduct(oEntry) {
     return {
-        product_number: oEntry.content["m:properties"]["d:ProductID"].$t,
-        product_title: oEntry.content["m:properties"]["d:ProductName"]
+        ProductId: oEntry.content["m:properties"]["d:ProductID"].$t,
+        ProductTitle: oEntry.content["m:properties"]["d:ProductName"]
     }
 }
 
 function parseOrder(oEntry, aProducts) {
     const iId = oEntry.content["m:properties"]["d:ProductID"].$t;
-    const oProduct = aProducts.find(e => e.product_number === iId);
+    const oProduct = aProducts.find(e => e.ProductId === iId);
     if (oProduct) {
         return {
-            product_number: iId,
-            product_title: oProduct.product_title,
-            price: oEntry.content["m:properties"]["d:UnitPrice"].$t,
-            quantity: oEntry.content["m:properties"]["d:Quantity"].$t,
-            timestamp: new Date().toISOString()
+            ProductId: iId,
+            ProductTitle: oProduct.ProductTitle,
+            Price: parseFloat(oEntry.content["m:properties"]["d:UnitPrice"].$t),
+            Quantity: parseInt(oEntry.content["m:properties"]["d:Quantity"].$t, 10)
         };
     }
+}
+
+function getRandomNumber(iMax) {
+    return Math.round(Math.random() * (iMax - 1));
 }
 
 async function getMockData() {
@@ -41,4 +45,50 @@ async function getMockData() {
     });
 }
 
-module.exports = getMockData
+async function getRandomMessageJSON() {
+    const aMockData = await getMockData();
+    const oTransaction = aMockData[getRandomNumber(aMockData.length)];
+
+    const oMessage = {
+        "schema": {
+            "type": "struct",
+            "fields": [
+                {
+                    "type": "string",
+                    "optional": false,
+                    "field": "Id"
+                },
+                {
+                    "type": "string",
+                    "optional": false,
+                    "field": "ProductId"
+                },
+                {
+                    "type": "string",
+                    "optional": false,
+                    "field": "ProductTitle"
+                },
+                {
+                    "type": "int32",
+                    "optional": false,
+                    "field": "Quantity"
+                },
+                {
+                    "type": "float",
+                    "optional": false,
+                    "field": "Price"
+                }
+            ],
+            "optional": false,
+            "name": "transaction"
+        },
+        "payload": oTransaction
+    }
+
+    oTransaction.Id = "1";
+    return JSON.stringify(oMessage);
+}
+
+
+module.exports = {getRandomMessageJSON};
+
